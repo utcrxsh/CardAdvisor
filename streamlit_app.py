@@ -2,10 +2,7 @@
 import streamlit as st
 from streamlit_chat import message
 import re
-from cc_assistant import CreditCardAssistant
-
-assistant = CreditCardAssistant("creditcards.xlsx", "./chroma_db")
-agent = assistant.agent  # This is how you access it
+from cc_assistant import agent
 
 # --- Page Config ---
 st.set_page_config(
@@ -219,15 +216,14 @@ h2 {
 with st.sidebar:
     st.markdown("<h1>CreditAssistant</h1>", unsafe_allow_html=True)
     st.markdown("Your premier guide to Indian credit cards.")
-     
-    # Add details about the technology
+    
     st.write("**Key Features:**")
-    st.write("-  **Comprehensive Data:** Leverages a detailed dataset of Indian credit cards.")
-    st.write("-  **Advanced AI:** Utilizes Langchain and Retrieval Augmented Generation (RAG) to enable the AI to intelligently access and use the credit card information.")
-    st.write("-  **Smart Recommendations:** Get personalized credit card suggestions based on your needs.")
+    st.write("- **Comprehensive Data:** Leverages a detailed dataset of Indian credit cards.")
+    st.write("- **Advanced AI:** Utilizes LangChain and Retrieval Augmented Generation (RAG) for intelligent access to credit card information.")
+    st.write("- **Smart Recommendations:** Personalized credit card suggestions based on your needs.")
     
     st.image("https://www.headforpoints.com/wp-content/uploads/2024/03/American-Express-Amex-Centurion-card-webp.webp")
-    st.markdown("###Uncover")
+    st.markdown("### Uncover")
     show_details = st.checkbox("Show Behind-the-Scenes Processing", value=False)
     st.session_state["show_details"] = show_details
 
@@ -256,8 +252,8 @@ with main_col:
                         except:
                             st.write(msg["details"])
 
-# Chat input (outside main_col to ensure stickiness)
-if prompt := st.chat_input("Ask about credit cards (e.g., 'What are the Best travel cards ')"):
+# Chat input
+if prompt := st.chat_input("Ask about credit cards (e.g., 'What are the best travel cards')"):
     with main_col:
         st.session_state.messages.append({"role": "user", "content": prompt, "details": None})
         with st.chat_message("user"):
@@ -278,7 +274,7 @@ if prompt := st.chat_input("Ask about credit cards (e.g., 'What are the Best tra
                         recommendation = ""
                         
                         for line in lines:
-                            if line.startswith("Top "):
+                            if line.startswith("Summary of Top "):
                                 st.markdown(f"<h2>{line.strip()}</h2>", unsafe_allow_html=True)
                                 card_section = True
                             elif card_section and re.match(r"^\d+\.\s+", line):
@@ -293,9 +289,8 @@ if prompt := st.chat_input("Ask about credit cards (e.g., 'What are the Best tra
                                 if current_card:
                                     cards.append(current_card)
                                 card_section = False
-                                recommendation = line
-                            elif not card_section and line.strip() and not recommendation:
-                                st.write(line.strip())
+                                recommendation = line + "\n" + "\n".join(lines[lines.index(line)+1:])
+                                break
                         
                         for card in cards:
                             with st.container():
@@ -307,7 +302,7 @@ if prompt := st.chat_input("Ask about credit cards (e.g., 'What are the Best tra
                                         <br>Annual Fee: {card.get('Annual Fee', 'N/A')}
                                         <br>Reward Rate: {card.get('Reward Rate', 'N/A')}
                                         <br>Lounge Access: {card.get('Lounge Access', 'N/A')}
-                                        <br>Travel Perks: {card.get('Travel Perks', 'N/A')}
+                                        <br>Luxury Perks: {card.get('Luxury Perks', 'N/A')}
                                         <br>Welcome Bonus: {card.get('Welcome Bonus', 'N/A')}
                                     </p>
                                 </div>
@@ -331,11 +326,3 @@ if prompt := st.chat_input("Ask about credit cards (e.g., 'What are the Best tra
                     error_message = f"Sorry, something went wrong: {str(e)}"
                     st.error(error_message)
                     st.session_state.messages.append({"role": "assistant", "content": error_message, "details": None})
-
-# Footer
-# st.markdown("""
-# <div style='text-align: center; color: #c0c0c0; margin-top: 2rem;'>
-#     <p>CreditAssistant | Powered by AI | © 2025</p>
-# </div>
-# """, unsafe_allow_html=True)
- 
