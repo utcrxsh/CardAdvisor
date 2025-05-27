@@ -1,12 +1,4 @@
 
-"""Credit Card Assistant module.
-
-This module provides a conversational AI assistant for credit card queries,
-supporting card details lookup, comparisons, and category-based recommendations.
-It uses LangChain, Chroma vector store, and OpenAI for processing, with enhanced
-RAG for semantic search on card features and reviews.
-"""
-
 import logging
 import os
 from typing import Dict, List, Optional, Union
@@ -15,17 +7,13 @@ import pandas as pd
 import re
 import difflib
 from dotenv import load_dotenv
-import sys
-import pysqlite3
-sys.modules["sqlite3"] = pysqlite3
-from langchain_community.vectorstores.chroma import Chroma
+from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import DataFrameLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.agents import Tool, initialize_agent, AgentType
 from langchain.chains import RetrievalQA
-from langchain_community.embeddings import SentenceTransformerEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_openai import ChatOpenAI
-
 
 # Configure logging
 logging.basicConfig(
@@ -36,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 # Constants
 DATA_FILE = "creditcards.xlsx"
-CHROMA_DB_DIR = "./chroma_db"
+FAISS_INDEX_DIR = "./faiss_index"
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 LLM_MODEL = "mistralai/mistral-7b-instruct:free"
 OPENROUTER_API_BASE = "https://openrouter.ai/api/v1"
@@ -70,27 +58,30 @@ class VectorStoreError(CreditCardAssistantError):
 class CreditCardAssistant:
     """Assistant for credit card queries using LangChain and vector search."""
 
-    def __init__(self, data_path: str, chroma_db_dir: str) -> None:
+    def __init__(self, data_path: str, faiss_index_dir: str) -> None:
         """Initialize the assistant with data and vector store paths.
 
         Args:
             data_path: Path to the credit card Excel file.
-            chroma_db_dir: Directory for Chroma vector store.
+            faiss_index_dir: Directory for FAISS vector store.
 
         Raises:
             CreditCardAssistantError: If initialization fails.
         """
         load_dotenv()
-        self.api_key = "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" 
+        self.api_key = "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"
         if not self.api_key:
             raise CreditCardAssistantError("OPENROUTER_API_KEY not set.")
 
         self.data_path = Path(data_path)
-        self.chroma_db_dir = Path(chroma_db_dir)
+        self.faiss_index_dir = Path(faiss_index_dir)
         self.df = self._load_data()
         self.vectorstore = self._setup_vectorstore()
         self.llm = self._setup_llm()
-        self.qa_chain = RetrievalQA.from_chain_type(llm=self.llm, retriever=self.vectorstore.as_retriever())
+        self.qa_chain = RetrievalQA.from_chain_type(
+            llm=self.llm,
+            retriever=self.vectorstore.as_retriever(search_kwargs={"k": 5})
+        )
         self.agent = self._setup_agent()
 
     def _load_data(self) -> pd.DataFrame:
@@ -108,14 +99,12 @@ class CreditCardAssistant:
             df = pd.read_excel(self.data_path)
             if df.empty:
                 raise DataLoadingError("Excel file is empty.")
-            df = pd.read_excel("creditcards.xlsx")
             df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
 
             def clean_currency_column(df, column):
                 df[column] = df[column].astype(str).str.replace('₹', '', regex=False).str.replace(',', '', regex=False)
                 df[column] = pd.to_numeric(df[column], errors='coerce')
 
-                # Clean relevant currency columns
             if "annual_fee" in df.columns:
                 clean_currency_column(df, "annual_fee")
 
@@ -137,18 +126,18 @@ class CreditCardAssistant:
         except Exception as e:
             raise DataLoadingError(f"Failed to load data: {str(e)}")
 
-    def _setup_vectorstore(self) -> Chroma:
-        """Set up Chroma vector store with embeddings of combined content.
+    def _setup_vectorstore(self) -> FAISS:
+        """Set up FAISS vector store with embeddings of combined content.
 
         Returns:
-            Chroma vector store instance.
+            FAISS vector store instance.
 
         Raises:
             VectorStoreError: If vector store setup fails.
         """
         try:
-            embeddings = SentenceTransformerEmbeddings(model_name=EMBEDDING_MODEL)
-            if not self.chroma_db_dir.exists():
+            embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+            if not self.faiss_index_dir.exists():
                 # Load combined content with metadata
                 loader = DataFrameLoader(
                     self.df,
@@ -167,13 +156,11 @@ class CreditCardAssistant:
                 
                 splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
                 split_docs = splitter.split_documents(docs)
-                vectorstore = Chroma.from_documents(
-                    split_docs, embeddings, persist_directory=str(self.chroma_db_dir)
-                )
-                vectorstore.persist()
+                vectorstore = FAISS.from_documents(split_docs, embeddings)
+                vectorstore.save_local(str(self.faiss_index_dir))
             else:
-                vectorstore = Chroma(
-                    persist_directory=str(self.chroma_db_dir), embedding_function=embeddings
+                vectorstore = FAISS.load_local(
+                    str(self.faiss_index_dir), embeddings, allow_dangerous_deserialization=True
                 )
             return vectorstore
         except Exception as e:
@@ -385,7 +372,7 @@ class CreditCardAssistant:
         """
         try:
             logger.info(f"Executing RAG query: {query}")
-            response = self.qa_chain.run(query)
+            response = self.qa_chain.invoke({"query": query})["result"]
             logger.info(f"RAG response: {response}")
             return response
         except Exception as e:
@@ -551,11 +538,10 @@ class CreditCardAssistant:
             logger.error(f"Error processing query '{query}': {str(e)}")
             return f"Error processing query: {str(e)}"
 
-
 def main():
     """Run the CreditCardAssistant in interactive mode."""
     try:
-        assistant = CreditCardAssistant(DATA_FILE, CHROMA_DB_DIR)
+        assistant = CreditCardAssistant(DATA_FILE, FAISS_INDEX_DIR)
         logger.info("Credit Card Assistant is ready. Type 'exit' or 'quit' to stop.")
         while True:
             query = input("Ask about credit cards: ")
@@ -566,7 +552,6 @@ def main():
     except CreditCardAssistantError as e:
         logger.error(f"Initialization failed: {str(e)}")
         print(f"Error: {str(e)}")
-
 
 if __name__ == "__main__":
     main()
