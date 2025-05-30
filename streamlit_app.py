@@ -150,7 +150,7 @@ h2 {
     background-color: #2a2f30;
     color: #c0c0c0;
     font-size: 1.3rem;
-    height: 120px;
+    height: 60px;
     padding: 0.8rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
