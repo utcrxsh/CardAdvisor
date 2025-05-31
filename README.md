@@ -6,6 +6,12 @@ CardAdvisor is an innovative, AI-driven application designed to help users navig
 
 Whether you're looking to maximize rewards, minimize fees, or find a card tailored to your lifestyle, CardAdvisor leverages cutting-edge language models and a robust knowledge base to deliver insightful and reliable advice.
 
+
+---
+
+## Demo
+![Demo](demo.mp4)
+
 ---
 
 ## 🌟 Features
