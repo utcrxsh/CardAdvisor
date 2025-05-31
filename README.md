@@ -10,7 +10,7 @@ Whether you're looking to maximize rewards, minimize fees, or find a card tailor
 ---
 
 ## Demo
-![Demo](demo.mp4)
+![Demo](demo.gif)
 
 ---
 
