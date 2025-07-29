@@ -1,0 +1,252 @@
+/* Custom styles for CardAdvisor */
+
+body {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    min-height: 100vh;
+}
+
+/* Ensure the chat container fills the viewport */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh; /* Use 100dvh for mobile safety */
+    min-height: 0;
+}
+
+/* Make chat-messages fill available space */
+.chat-messages {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding-bottom: 40px; /* JS will override this */
+    min-height: 0;
+}
+
+/* Make sure the input container is always on top and visually separated */
+.chat-input-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.15);
+    border-top: 1px solid #333;
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .chat-container {
+        height: 100dvh;
+    }
+    .chat-input-container {
+        padding: 0.5rem;
+    }
+}
+
+/* Message styling */
+.message {
+    margin-bottom: 1.5rem;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.user-message {
+    text-align: right;
+}
+
+.user-message .message-content {
+    background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+    color: #000;
+    border-radius: 18px 18px 4px 18px;
+    padding: 12px 18px;
+    display: inline-block;
+    max-width: 70%;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+}
+
+.assistant-message .message-content {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 18px 18px 18px 4px;
+    padding: 12px 18px;
+    max-width: 80%;
+    backdrop-filter: blur(10px);
+}
+
+/* Card recommendations styling */
+.card-recommendation {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1rem 0;
+    backdrop-filter: blur(10px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-recommendation:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 193, 7, 0.2);
+}
+
+.card-title {
+    color: #ffc107;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.card-badge {
+    background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+    color: #000;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Debug info styling */
+.debug-info {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 193, 7, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Custom scrollbar */
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: rgba(255, 193, 7, 0.5);
+    border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 193, 7, 0.7);
+}
+
+/* Input styling */
+.form-control {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #fff;
+    border-radius: 25px;
+    padding: 12px 20px;
+    backdrop-filter: blur(10px);
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    color: #fff;
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Button styling */
+.btn-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+    border: none;
+    color: #000;
+    font-weight: 600;
+    border-radius: 25px;
+    padding: 12px 20px;
+    transition: all 0.2s ease;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #ffb300 0%, #ffa000 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+    color: #000;
+}
+
+.btn-outline-warning {
+    border-color: #ffc107;
+    color: #ffc107;
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-warning:hover {
+    background: #ffc107;
+    color: #000;
+    transform: translateY(-1px);
+}
+
+/* Loading animation */
+.loading-dots {
+    display: inline-block;
+}
+
+.loading-dots::after {
+    content: '';
+    animation: dots 1.5s steps(5, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: ''; }
+    40% { content: '.'; }
+    60% { content: '..'; }
+    80%, 100% { content: '...'; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .chat-input-container {
+        padding: 0.5rem;
+    }
+    
+    .message-content {
+        max-width: 90% !important;
+    }
+    
+    .card-recommendation {
+        margin: 0.5rem 0;
+        padding: 0.75rem;
+    }
+}
+
+/* Modal styling */
+.modal-content {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(255, 193, 7, 0.2);
+} 

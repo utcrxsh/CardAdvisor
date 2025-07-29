@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardAdvisor - Your Credit Card Assistant</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-warning">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="bi bi-credit-card-2-front text-warning"></i>
+                CardAdvisor
+            </a>
+            <span class="navbar-text text-muted">Your AI Credit Card Assistant</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 col-md-4 bg-dark border-end border-warning">
+                <div class="p-4">
+                    <h5 class="text-warning mb-3">
+                        <i class="bi bi-info-circle"></i> About
+                    </h5>
+                    <p class="text-muted small">
+                        CardAdvisor uses advanced AI to help you find the perfect credit card. 
+                        Ask questions about rewards, fees, or compare cards side-by-side.
+                    </p>
+                    
+                    <h6 class="text-warning mt-4 mb-2">
+                        <i class="bi bi-lightbulb"></i> Try asking:
+                    </h6>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-warning btn-sm" onclick="askQuestion('What are the best travel credit cards?')">
+                            Best travel cards
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm" onclick="askQuestion('Compare HDFC Regalia and Amex Platinum')">
+                            Compare cards
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm" onclick="askQuestion('What cards have the lowest annual fees?')">
+                            Low fee cards
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm" onclick="askQuestion('Best cards for cashback rewards')">
+                            Cashback cards
+                        </button>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="debugMode">
+                            <label class="form-check-label text-muted small" for="debugMode">
+                                Show debug info
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="col-lg-9 col-md-8">
+                <div class="chat-container">
+                    <!-- Chat Messages -->
+                    <div id="chatMessages" class="chat-messages p-4">
+                        <!-- Welcome message -->
+                        <div class="message assistant-message">
+                            <div class="message-content">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-credit-card-2-front text-warning me-2"></i>
+                                    <strong>CardAdvisor</strong>
+                                </div>
+                                <p class="mb-0">Welcome to CardAdvisor! How can I assist you with your credit card needs today?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="chat-input-container">
+                        <div class="input-group">
+                            <input type="text" id="messageInput" class="form-control" 
+                                   placeholder="Ask about credit cards..." 
+                                   onkeypress="handleKeyPress(event)">
+                            <button class="btn btn-warning" type="button" onclick="sendMessage()">
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner Modal -->
+    <div class="modal fade" id="loadingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-body text-center">
+                    <div class="spinner-border text-warning mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mb-0">Finding the best cards for you...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html> 

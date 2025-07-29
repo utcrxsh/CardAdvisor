@@ -1,0 +1,17 @@
+# Core web dependencies
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+
+# Core AI/ML dependencies
+pandas
+openpyxl
+langchain
+langchain-huggingface
+langchain-community
+faiss-cpu
+torch
+sentence-transformers
+groq
+python-dotenv
